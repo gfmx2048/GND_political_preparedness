@@ -13,7 +13,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 import java.util.*
 
-private const val BASE_URL = "https://www.googleapis.com/civicinfo/v2/"
+private const val BASE_URL = "https://civicinfo.googleapis.com/civicinfo/v2/"
 
 private val moshi = Moshi.Builder()
         .add(ElectionAdapter())

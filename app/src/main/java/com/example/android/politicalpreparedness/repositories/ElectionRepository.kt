@@ -59,6 +59,7 @@ class ElectionRepository( private val electionDao: ElectionDao, private val ioDi
 
     override suspend fun refreshElectionsOnline() = withContext(ioDispatcher) {
         try {
+            Timber.d("Refresh Elections")
             _status.postValue(ElectionsApiStatus.LOADING)
             val electionsResponse = CivicsApi.retrofitService.getElectionsAsync()
             electionDao.insertAll(*electionsResponse.elections.toTypedArray())
