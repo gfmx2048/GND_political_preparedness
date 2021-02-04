@@ -8,6 +8,7 @@
     <!-- TODO: Add motion scene to hide form on vertical scroll. -->
     <androidx.constraintlayout.motion.widget.MotionLayout
         android:layout_height="match_parent"
+        app:layoutDescription="@xml/representative_screen_animations"
         android:layout_width="match_parent">
 
         <!-- TODO: Add visual styling and content -->

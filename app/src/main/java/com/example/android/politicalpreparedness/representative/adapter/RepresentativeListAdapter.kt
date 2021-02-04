@@ -10,12 +10,11 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.android.politicalpreparedness.R
-import com.example.android.politicalpreparedness.databinding.ViewholderRepresentativeBinding
+import com.example.android.politicalpreparedness.databinding.ListItemRepresentativeBinding
 import com.example.android.politicalpreparedness.network.models.Channel
 import com.example.android.politicalpreparedness.representative.model.Representative
 
-class RepresentativeListAdapter: ListAdapter<Representative, RepresentativeViewHolder>(RepresentativeDiffCallback()){
+class RepresentativeListAdapter(private val clickListener: RepresentativeListener) : ListAdapter<Representative, RepresentativeViewHolder>(RepresentativeDiffCallback()){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RepresentativeViewHolder {
         return RepresentativeViewHolder.from(parent)
@@ -23,15 +22,15 @@ class RepresentativeListAdapter: ListAdapter<Representative, RepresentativeViewH
 
     override fun onBindViewHolder(holder: RepresentativeViewHolder, position: Int) {
         val item = getItem(position)
-        holder.bind(item)
+        holder.bind(item,clickListener)
     }
 }
 
-class RepresentativeViewHolder(val binding: ViewholderRepresentativeBinding): RecyclerView.ViewHolder(binding.root) {
+class RepresentativeViewHolder(val binding: ListItemRepresentativeBinding): RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(item: Representative) {
+    fun bind(item: Representative, clickListener: RepresentativeListener) {
         binding.representative = item
-        binding.representativePhoto.setImageResource(R.drawable.ic_profile)
+        binding.clickListener = clickListener
 
         //TODO: Show social links ** Hint: Use provided helper methods
         //TODO: Show www link ** Hint: Use provided helper methods
@@ -39,18 +38,24 @@ class RepresentativeViewHolder(val binding: ViewholderRepresentativeBinding): Re
         binding.executePendingBindings()
     }
 
-    //TODO: Add companion object to inflate ViewHolder (from)
+    companion object {
+        fun from(parent: ViewGroup): RepresentativeViewHolder {
+            val layoutInflater = LayoutInflater.from(parent.context)
+            val binding = ListItemRepresentativeBinding.inflate(layoutInflater, parent, false)
+            return RepresentativeViewHolder(binding)
+        }
+    }
 
     private fun showSocialLinks(channels: List<Channel>) {
         val facebookUrl = getFacebookUrl(channels)
-        if (!facebookUrl.isNullOrBlank()) { enableLink(binding.facebookIcon, facebookUrl) }
+        if (!facebookUrl.isNullOrBlank()) { enableLink(binding.ivFacebook, facebookUrl) }
 
         val twitterUrl = getTwitterUrl(channels)
-        if (!twitterUrl.isNullOrBlank()) { enableLink(binding.twitterIcon, twitterUrl) }
+        if (!twitterUrl.isNullOrBlank()) { enableLink(binding.ivTwitter, twitterUrl) }
     }
 
     private fun showWWWLinks(urls: List<String>) {
-        enableLink(binding.wwwIcon, urls.first())
+        enableLink(binding.ivUrl, urls.first())
     }
 
     private fun getFacebookUrl(channels: List<Channel>): String? {
@@ -78,6 +83,17 @@ class RepresentativeViewHolder(val binding: ViewholderRepresentativeBinding): Re
 
 }
 
-//TODO: Create RepresentativeDiffCallback
+class RepresentativeDiffCallback : DiffUtil.ItemCallback<Representative>() {
+    override fun areItemsTheSame(oldItem: Representative, newItem: Representative): Boolean {
+        return oldItem.official == newItem.official
+    }
 
-//TODO: Create RepresentativeListener
+    override fun areContentsTheSame(oldItem: Representative, newItem: Representative): Boolean {
+        return oldItem == newItem // equality check on all the fields, as it is a data class
+    }
+
+}
+
+class RepresentativeListener(val clickListener: (representative: Representative) -> Unit) {
+    fun onClick(representative: Representative) = clickListener(representative)
+}

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="representative"
+            type="com.example.android.politicalpreparedness.representative.model.Representative" />
+
+        <variable
+            name="clickListener"
+            type="com.example.android.politicalpreparedness.representative.adapter.RepresentativeListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="@{() -> clickListener.onClick(representative)}"
+        android:paddingStart="6dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="6dp"
+        android:paddingBottom="2dp">
+
+        <ImageView
+            android:id="@+id/iv_profile"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:contentDescription="@string/profile_picture"
+            android:src="@drawable/ic_profile"
+            app:profileImage="@{representative.official.photoUrl}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_title"
+            style="@style/tv_label_style"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:minHeight="30dp"
+            android:paddingStart="6dp"
+            android:paddingEnd="4dp"
+            android:text="@{representative.office.name}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/iv_profile"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="PlaceHolder text" />
+
+        <TextView
+            android:id="@+id/tv_name"
+            style="@style/tv_subtitle_style"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingStart="6dp"
+            android:paddingEnd="4dp"
+            android:text="@{representative.official.name}"
+            app:layout_constraintEnd_toStartOf="@+id/iv_url"
+            app:layout_constraintStart_toEndOf="@+id/iv_profile"
+            app:layout_constraintTop_toBottomOf="@+id/tv_title"
+            tools:text="PlaceHolder text" />
+
+        <TextView
+            android:id="@+id/tv_party"
+            style="@style/tv_subtitle_style"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingStart="6dp"
+            android:paddingEnd="4dp"
+            android:text="@{representative.official.party}"
+            app:layout_constraintEnd_toStartOf="@+id/iv_url"
+            app:layout_constraintStart_toEndOf="@+id/iv_profile"
+            app:layout_constraintTop_toBottomOf="@+id/tv_name"
+            tools:text="PlaceHolder text" />
+
+        <ImageView
+            android:id="@+id/iv_url"
+            android:layout_width="@dimen/icons_size"
+            android:layout_height="@dimen/icons_size"
+            android:layout_marginEnd="6dp"
+            android:contentDescription="@string/twitter"
+            android:src="@drawable/ic_www"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/iv_facebook" />
+
+        <ImageView
+            android:id="@+id/iv_facebook"
+            android:layout_width="@dimen/icons_size"
+            android:layout_height="@dimen/icons_size"
+            android:layout_marginEnd="6dp"
+            android:contentDescription="@string/twitter"
+            android:src="@drawable/ic_facebook"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/iv_twitter" />
+
+        <ImageView
+            android:id="@+id/iv_twitter"
+            android:layout_width="@dimen/icons_size"
+            android:layout_height="@dimen/icons_size"
+            android:layout_marginEnd="6dp"
+            android:contentDescription="@string/twitter"
+            android:src="@drawable/ic_twitter"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
