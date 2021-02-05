@@ -42,13 +42,12 @@ interface CivicsApiService {
     @GET("elections")
     suspend fun getElectionsAsync(): ElectionResponse// with the suspend function we don't need deferred<>
 
-    //TODO: Add voterinfo API Call
     /**
      * Looks up information relevant to a voter based on the voter's registered address.
      * Required query parameters: address -> The registered address of the voter to look up.
      */
     @GET("voterinfo")
-    suspend fun getVoterInfoAsync(@Query("address")address: String): VoterInfoResponse
+    suspend fun getVoterInfoAsync(@Query("electionId") election: Int,@Query("address")address: String): VoterInfoResponse
 
     /**
      * Looks up political geography and representative information for a single address

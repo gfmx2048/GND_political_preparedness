@@ -37,13 +37,20 @@ interface ElectionDao {
      * @return the election object with the electionId
      */
     @Query("SELECT * FROM election_table where id = :electionId")
-    suspend fun getElectionsById(electionId: String): Election?
+    suspend fun getElectionsById(electionId: Int): Election?
+
+    /**
+     * @param electionId the id of the election
+     * @return the election object with the electionId
+     */
+    @Query("SELECT * FROM election_table where id = :electionId")
+    fun getElectionsByIdLD(electionId: Int): LiveData<Election?>
 
     /**
      * Delete election by id
      */
     @Query("DELETE FROM election_table where id = :electionId")
-    suspend fun deleteElections(electionId: String)
+    suspend fun deleteElections(electionId: Int)
 
     /**
      * Delete all elections.

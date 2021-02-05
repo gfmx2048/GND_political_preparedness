@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 class ElectionsViewModel(private val dataSource: ElectionsDataSource): ViewModel() {
 
-    val upcomingElections = dataSource.getElections()
+    val upcomingElections = dataSource.getUpcomingElections()
     val savedElections = dataSource.getElections()
     val refreshStatusOfElections = dataSource.electionsStatus()
 
@@ -23,11 +23,11 @@ class ElectionsViewModel(private val dataSource: ElectionsDataSource): ViewModel
 
     //Refresh elections and save them in db, then observe db elections data
     init {
-       viewModelScope.launch { dataSource.refreshElectionsOnline() }
+       refreshOnlineElections()
     }
 
-    fun saveElection(election: Election) = viewModelScope.launch{
-        dataSource.saveElection(election)
+    fun refreshOnlineElections() = viewModelScope.launch{
+        dataSource.refreshElectionsOnline()
     }
 
     fun onElectionClicked(election: Election) {
@@ -37,13 +37,4 @@ class ElectionsViewModel(private val dataSource: ElectionsDataSource): ViewModel
     fun clearSelectedElection(){
         _selectedElection.value = null
     }
-
-    //TODO: Create live data val for upcoming elections
-
-    //TODO: Create live data val for saved elections
-
-    //TODO: Create val and functions to populate live data for upcoming elections from the API and saved elections from local database
-
-    //TODO: Create functions to navigate to saved or upcoming election voter info
-
 }

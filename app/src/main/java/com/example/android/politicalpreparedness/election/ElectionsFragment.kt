@@ -6,18 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.android.politicalpreparedness.R
 import com.example.android.politicalpreparedness.databinding.FragmentElectionBinding
 import com.example.android.politicalpreparedness.election.adapter.ElectionListAdapter
 import com.example.android.politicalpreparedness.election.adapter.ElectionListener
-import com.example.android.politicalpreparedness.network.jsonadapter.ElectionAdapter
+import com.example.android.politicalpreparedness.repositories.ElectionsApiStatus
 import com.example.android.politicalpreparedness.setDisplayHomeAsUpEnabled
 import com.example.android.politicalpreparedness.setTitle
+import com.google.android.material.snackbar.Snackbar
 
 class ElectionsFragment: Fragment() {
 
@@ -28,7 +26,6 @@ class ElectionsFragment: Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
-        //TODO: Add ViewModel values and create ViewModel
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_election,container,false)
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
@@ -39,11 +36,6 @@ class ElectionsFragment: Fragment() {
         binding.rvUpcoming.adapter = ElectionListAdapter(ElectionListener { viewModel.onElectionClicked(it) })
         binding.rvSaved.adapter = ElectionListAdapter(ElectionListener { viewModel.onElectionClicked(it) })
 
-        //TODO: Link elections to voter info
-
-        //TODO: Initiate recycler adapters
-
-        //TODO: Populate recycler adapters
         subscribeToLiveData()
         return binding.root
     }
@@ -52,7 +44,23 @@ class ElectionsFragment: Fragment() {
         viewModel.selectedElection.observe(viewLifecycleOwner, {
             it?.let {
                 viewModel.clearSelectedElection()
-                this.findNavController().navigate(ElectionsFragmentDirections.actionElectionsFragmentToVoterInfoFragment(it.id,it.division))
+                this.findNavController().navigate(ElectionsFragmentDirections.actionElectionsFragmentToVoterInfoFragment(it))
+            }
+        })
+
+        viewModel.refreshStatusOfElections.observe(viewLifecycleOwner, {
+            it?.let {
+                viewModel.clearSelectedElection()
+                when(it){
+                    ElectionsApiStatus.LOADING -> binding.statusLoadingWheel.visibility = View.VISIBLE
+                    ElectionsApiStatus.ERROR -> {
+                        binding.statusLoadingWheel.visibility = View.GONE
+                        Snackbar.make(binding.clParentElections, getString(R.string.elections_error), Snackbar.LENGTH_INDEFINITE).setAction(R.string.retry) {
+                            viewModel.refreshOnlineElections()
+                        }.show()
+                    }
+                    ElectionsApiStatus.DONE -> binding.statusLoadingWheel.visibility = View.GONE
+                }
             }
         })
     }
