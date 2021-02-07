@@ -11,8 +11,10 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <!-- TODO: Add necessary styles -->
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:textColorSecondary">@android:color/white</item>
+    </style>
 
     <style name="bt_style">
         <item name="android:textSize">@dimen/bt_text_size</item>

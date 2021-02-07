@@ -15,8 +15,18 @@
     <string name="voting_locations">Voting locations</string>
     <string name="ballot_information">Ballot information</string>
     <string name="voter_info_error">Error getting voter info</string>
+    <string name="rep_info_error">Error getting representative info</string>
     <string name="correspondence_address">Correspondence address</string>
+    <string name="representative_search">Representative Search</string>
+    <string name="my_representatives">My Representatives</string>
+    <string name="use_my_location">USE MY LOCATION</string>
+    <string name="zip">Zip</string>
+    <string name="city">City</string>
+    <string name="address_line_2">Address Line 2</string>
+    <string name="address_line_1">Address Line 1</string>
+    <string name="location_settings_are_on">Location settings are on</string>
+    <string name="allow_permission">Please allow location permissions so we can populate the view with your current details</string>
+    <string name="location_required_error">Error getting location</string>
 
-    <!-- TODO: Add necessary string values -->
 
 </resources>

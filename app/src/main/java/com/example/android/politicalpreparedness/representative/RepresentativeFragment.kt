@@ -1,79 +1,114 @@
 package com.example.android.politicalpreparedness.representative
 
-import android.content.Context
-import android.location.Geocoder
-import android.location.Location
 import android.os.Bundle
 import android.view.*
-import android.view.inputmethod.InputMethodManager
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import com.example.android.politicalpreparedness.R
+import androidx.fragment.app.activityViewModels
+import com.example.android.politicalpreparedness.*
 import com.example.android.politicalpreparedness.databinding.FragmentRepresentativeBinding
-import com.example.android.politicalpreparedness.election.ElectionsViewModel
-import com.example.android.politicalpreparedness.election.ElectionsViewModelFactory
-import com.example.android.politicalpreparedness.network.models.Address
-import java.util.Locale
+import com.example.android.politicalpreparedness.repositories.RepresentativeApiStatus
+import com.example.android.politicalpreparedness.representative.adapter.RepresentativeListAdapter
+import com.example.android.politicalpreparedness.representative.adapter.RepresentativeListener
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.fragment_representative.view.*
+import kotlinx.android.synthetic.main.fragment_voter_info.*
 
 class DetailFragment : Fragment() {
 
-    companion object {
-        //TODO: Add Constant for Location request
+    private val viewModel: RepresentativeViewModel by activityViewModels(){
+        RepresentativeViewModelFactory(requireActivity().application)
     }
-
-    //TODO: Declare ViewModel
-    private val viewModel: RepresentativeViewModel by viewModels()
     private lateinit var binding: FragmentRepresentativeBinding
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+                              savedInstanceState: Bundle?): View {
 
-        //TODO: Establish bindings
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_representative,container,false)
-//        binding.lifecycleOwner = this
-//        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
+        binding.viewModel = viewModel
 
-        //TODO: Define and assign Representative adapter
+        val states = resources.getStringArray(R.array.states)
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, states)
+        binding.state.adapter = adapter
+        binding.state.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+               viewModel.selectedCurrentAddress.state = states[p2]
+            }
 
-        //TODO: Populate Representative adapter
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+               //NO OP
+            }
 
-        //TODO: Establish button listeners for field and location search
+        }
+
+        setDisplayHomeAsUpEnabled(false)
+        setTitle(getString(R.string.app_name))
+
+        binding.rvMyRepresentative.adapter = RepresentativeListAdapter(RepresentativeListener {
+                //NO OP
+        })
+
+        binding.buttonLocation.setOnClickListener {  viewModel.getLocationF() }
+        binding.buttonSearch.setOnClickListener {
+            hideKeyboard()
+
+            if(viewModel.selectedCurrentAddress.line1.isEmpty()){
+                Toast.makeText(requireContext(),"Add a street address",Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if(viewModel.selectedCurrentAddress.city.isEmpty()){
+                Toast.makeText(requireContext(),"Add a city",Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if(viewModel.selectedCurrentAddress.zip.isEmpty()){
+                Toast.makeText(requireContext(),"Add a zip",Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            viewModel.searchRepresentatives()
+        }
+        subscribeToLiveData()
     return binding.root
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        //TODO: Handle location permission result to get location on permission granted
-    }
-
-    private fun checkLocationPermissions(): Boolean {
-        return if (isPermissionGranted()) {
-            true
-        } else {
-            //TODO: Request Location permissions
-            false
-        }
-    }
-
-    private fun isPermissionGranted() : Boolean {
-        //TODO: Check if permission is already granted and return (true = granted, false = denied/other)
-        return true
-    }
-
-    private fun getLocation() {
-        //TODO: Get location from LocationServices
-        //TODO: The geoCodeLocation method is a helper function to change the lat/long location to a human readable street address
-    }
-
-    private fun geoCodeLocation(location: Location): Address {
-        val geocoder = Geocoder(context, Locale.getDefault())
-        return geocoder.getFromLocation(location.latitude, location.longitude, 1)
-                .map { address ->
-                    Address(address.thoroughfare, address.subThoroughfare, address.locality, address.adminArea, address.postalCode)
+    private fun subscribeToLiveData() {
+            viewModel.selectedAddress.observe(viewLifecycleOwner, {
+                it?.let {
+                    val position = resources.getStringArray(R.array.states).indexOf(it.state)
+                    binding.state.setSelection(position)
+                    binding.invalidateAll()
                 }
-                .first()
+            })
+
+        viewModel.representativeInfo.observe(viewLifecycleOwner, {
+            it?.let {
+                binding.rvMyRepresentative.visibility = View.VISIBLE
+                (binding.rvMyRepresentative.adapter as RepresentativeListAdapter).submitList(it)
+            }
+        })
+
+        viewModel.representativeApiStatus.observe(viewLifecycleOwner, {
+            it?.let {
+                viewModel.clearRepresentativeStatus()
+                when(it){
+                    RepresentativeApiStatus.LOADING -> binding.statusLoadingWheel.visibility = View.VISIBLE
+                    RepresentativeApiStatus.ERROR -> {
+                        binding.statusLoadingWheel.visibility = View.GONE
+                        Snackbar.make(binding.mlParent, getString(R.string.rep_info_error), Snackbar.LENGTH_INDEFINITE).setAction(R.string.retry) {
+                                viewModel.searchRepresentatives()
+                        }.show()
+                    }
+                    RepresentativeApiStatus.DONE -> binding.statusLoadingWheel.visibility = View.GONE
+                }
+            }
+        })
     }
 
 }

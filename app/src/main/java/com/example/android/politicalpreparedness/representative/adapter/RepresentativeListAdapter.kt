@@ -32,8 +32,8 @@ class RepresentativeViewHolder(val binding: ListItemRepresentativeBinding): Recy
         binding.representative = item
         binding.clickListener = clickListener
 
-        //TODO: Show social links ** Hint: Use provided helper methods
-        //TODO: Show www link ** Hint: Use provided helper methods
+        item.official.channels?.let { showSocialLinks(it) }
+        item.official.urls?.let { showWWWLinks(it) }
 
         binding.executePendingBindings()
     }

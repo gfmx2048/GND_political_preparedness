@@ -2,9 +2,8 @@ package com.example.android.politicalpreparedness.repositories
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.android.politicalpreparedness.network.models.Election
-import com.example.android.politicalpreparedness.network.models.Result
-import com.example.android.politicalpreparedness.network.models.VoterInfoResponse
+import com.example.android.politicalpreparedness.network.models.*
+import com.example.android.politicalpreparedness.representative.model.Representative
 
 /**
  * Created by Vasilis viktoratos on 4/2/2021.
@@ -25,4 +24,8 @@ interface ElectionsDataSource {
     fun clearVoterStatus()
     suspend fun refreshVoterInfo(election: Election)
     fun getVoterInfo(): LiveData<VoterInfoResponse?>
+    fun representativeStatus(): MutableLiveData<RepresentativeApiStatus?>
+    fun clearRepresentativeStatus()
+    suspend fun refreshRepresentatives(address: Address)
+    fun getRepresentativeInfo(): LiveData<List<Representative>>
 }

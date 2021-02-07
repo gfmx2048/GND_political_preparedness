@@ -1,26 +1,69 @@
 package com.example.android.politicalpreparedness.representative
 
+import android.location.Geocoder
+import android.location.Location
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.android.politicalpreparedness.SingleLiveEvent
+import com.example.android.politicalpreparedness.network.models.Address
+import com.example.android.politicalpreparedness.repositories.ElectionsDataSource
+import com.example.android.politicalpreparedness.representative.model.Representative
+import kotlinx.coroutines.launch
+import timber.log.Timber
+import java.util.*
 
-class RepresentativeViewModel: ViewModel() {
+class RepresentativeViewModel(private val dataSource: ElectionsDataSource): ViewModel() {
+    //the internal mutableLiveData
+    private val _getLocation = MutableLiveData<Boolean?>()
+    val showSnackBar: SingleLiveEvent<String> = SingleLiveEvent()
 
-    //TODO: Establish live data for representatives and address
+    //the external immutable LiveData
+    val getLocation: LiveData<Boolean?>
+        get() = _getLocation
 
-    //TODO: Create function to fetch representatives from API from a provided address
+    fun getLocationF() {_getLocation.value = true}
+    fun clearGetLocation(){ _getLocation.value = null }
 
-    /**
-     *  The following code will prove helpful in constructing a representative from the API. This code combines the two nodes of the RepresentativeResponse into a single official :
+    init {
+        Timber.d("ViewModel Init")
+    }
 
-    val (offices, officials) = getRepresentativesDeferred.await()
-    _representatives.value = offices.flatMap { office -> office.getRepresentatives(officials) }
+    var selectedCurrentAddress = Address("","","","","")
 
-    Note: getRepresentatives in the above code represents the method used to fetch data from the API
-    Note: _representatives in the above code represents the established mutable live data housing representatives
+    //the internal mutableLiveData
+    private val _selectedAddress = MutableLiveData<Address?>()
+    //the external immutable LiveData
+    val selectedAddress: LiveData<Address?>
+        get() = _selectedAddress
 
-     */
 
-    //TODO: Create function get address from geo location
+    val representativeInfo = dataSource.getRepresentativeInfo()
+    val representativeApiStatus = dataSource.representativeStatus()
 
-    //TODO: Create function to get address from individual fields
+
+    fun geoCodeLocation(location: Location, geoCoder: Geocoder): Address {
+        return geoCoder.getFromLocation(location.latitude, location.longitude, 1)
+                .map { address ->
+                    Address(address.thoroughfare?:"", address.subThoroughfare?:"", address.locality?:"", address.adminArea?:"", address.postalCode?:"")
+                }
+                .first()
+    }
+
+    fun setAddress(address: Address) {
+        _selectedAddress.value = address
+        selectedCurrentAddress = address
+    }
+
+    fun searchRepresentatives() {
+        viewModelScope.launch {
+            dataSource.refreshRepresentatives(selectedCurrentAddress)
+        }
+    }
+
+    fun clearRepresentativeStatus() {
+        dataSource.clearRepresentativeStatus()
+    }
 
 }

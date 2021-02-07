@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.example.android.politicalpreparedness.R
 import com.example.android.politicalpreparedness.databinding.FragmentLaunchBinding
+import com.example.android.politicalpreparedness.setTitle
 
 class LaunchFragment : Fragment() {
 
@@ -18,6 +20,8 @@ class LaunchFragment : Fragment() {
 
         binding.btFrLaunchRepresentatives.setOnClickListener { navToRepresentatives() }
         binding.btFrLaunchUpcoming.setOnClickListener { navToElections() }
+
+        setTitle(getString(R.string.app_name))
 
         return binding.root
     }

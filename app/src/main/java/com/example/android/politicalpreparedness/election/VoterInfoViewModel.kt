@@ -59,7 +59,4 @@ class VoterInfoViewModel(private val dataSource: ElectionsDataSource) : ViewMode
         dataSource.refreshVoterInfo(election)
     }
 
-    //TODO: Add var and methods to populate voter info
-
-    //TODO: Add var and methods to support loading URLs
 }

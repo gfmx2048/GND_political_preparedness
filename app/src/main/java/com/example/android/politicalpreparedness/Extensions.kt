@@ -1,10 +1,13 @@
 package com.example.android.politicalpreparedness
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
+import android.content.pm.PackageManager
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 
 /**
@@ -46,3 +49,10 @@ fun Fragment.setDisplayHomeAsUpEnabled(bool: Boolean) {
         )
     }
 }
+
+fun Context.checkSinglePermission(permission: String) : Boolean {
+    return ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
+}
+
+fun Context.foregroundPermissionEnabled(): Boolean  = this.checkSinglePermission(
+        Manifest.permission.ACCESS_FINE_LOCATION)

@@ -84,6 +84,10 @@ dependencies {
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation "androidx.room:room-ktx:$version_room"
 
+    // Kotlin
+    implementation "androidx.fragment:fragment-ktx:$fragment_version"
+    implementation "androidx.activity:activity-ktx:$activity_version"
+
     // Location
     implementation "com.google.android.gms:play-services-location:$version_play_services_location"
 
